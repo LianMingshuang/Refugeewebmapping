@@ -57,8 +57,24 @@
                     <select id="lstbasemaps" class="form-control" onchange="ChangeBaseMap()">
                     </select>
                     <hr />
-                    <strong>Map Legend</strong>
-                    <div id="legcont"></div>
+                    <div class="container">
+                        <ul class="nav nav-tabs nav-justified">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#leg" data-toggle="tab">Legend</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#cont" data-toggle="tab">Contents</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane container fade in active" id="leg">
+                                <div id="legcont"></div>
+                            </div>
+                            <div class="tab-pane container fade" id="cont">
+                                
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="col-md-9">
