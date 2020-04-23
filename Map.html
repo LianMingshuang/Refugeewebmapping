@@ -49,14 +49,16 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-3">
-                    <h6>Toggle Map/Scene View</h6>
+                    <strong>Toggle Map/Scene View</strong>
                     <button class="btn btn-primary btn-block" id="btnmap">Map View</button>
                     <button class="btn btn-warning btn-block" id="btnscene">Scene View</button>
                     <hr />
-                    <h6>Change Base Map</h6>
+                    <strong>Change Base Map</strong>
                     <select id="lstbasemaps" class="form-control" onchange="ChangeBaseMap()">
                     </select>
                     <hr />
+                    <strong>Map Legend</strong>
+                    <div id="legcont"></div>
                 </div>
 
                 <div class="col-md-9">
@@ -84,11 +86,18 @@
         let viewtype = "Map";
         let basem = "topo";
 
+        let viewrun = 0;
+
+        let countrypath = "https://services5.arcgis.com/FKwcDz27wRAj4HUT/arcgis/rest/services/Countries/FeatureServer";
+        let healthpath = "https://services5.arcgis.com/FKwcDz27wRAj4HUT/arcgis/rest/services/Venezuela_Health/FeatureServer";
+        let edupath = "https://services5.arcgis.com/FKwcDz27wRAj4HUT/arcgis/rest/services/Venezuela_Education/FeatureServer";
+        let pathlist = [countrypath, healthpath, edupath]
+
         Loadmap();
         LoadBaseMaps();
         function Loadmap() {
             if (viewtype == "Map") {
-                require(["esri/Map", "esri/views/MapView"], function (Map, MapView) {
+                require(["esri/Map", "esri/views/MapView", "esri/layers/FeatureLayer", "esri/widgets/Legend"], function (Map, MapView, MapLayer, Legend) {
                     base = new Map({ basemap: basem });
                     mapview = new MapView({
                         container: "mapview",
@@ -96,10 +105,22 @@
                         center: [-65.631209, 7.270718],
                         zoom: 5
                     })
+                    for (i = 0; i < pathlist.length; i++) {
+                        let layer = new MapLayer({ url: pathlist[i] });
+                        base.add(layer);
+                    }
+                  
+                    if (viewrun == 0) {
+                        let legend = new Legend({
+                            view: mapview
+                        }, "legcont");
+                    };
+                    viewrun++;
                 })
-
-            } else {
-                require(["esri/Map", "esri/views/SceneView"], function (Map, SceneView) {
+            }
+            else
+            {
+                require(["esri/Map", "esri/views/SceneView", "esri/layers/FeatureLayer", "esri/widgets/Legend"], function (Map, SceneView, MapLayer, Legend) {
                     base = new Map({ basemap: basem });
                     mapview = new SceneView({
                         container: "mapview",
@@ -107,6 +128,10 @@
                         center: [-65.631209, 7.270718],
                         zoom: 2
                     })
+                    for (i = 0; i < pathlist.length; i++) {
+                        let layer = new MapLayer({ url: pathlist[i] });
+                        base.add(layer);
+                    }
                 })
             }
         }
@@ -146,12 +171,20 @@
             Loadmap();
         }
 
+        function Initializelegend() {
+            let cont = docum.getElementById("legcont");
+            if (cont.hasChildNodes()) {
+                cont.removeChild(cont.childNodes[0]);
+            }
+            let legend = new Legend({ view: mapview }, "legcont");
+        }
+
         document.getElementById("btnmap").addEventListener("click", function () {
             if (viewtype != "Map") {
-                viewtype = "Map";
+               viewtype = "Map";
             }
-            ChangeBaseMap()
-            Loadmap();
+           ChangeBaseMap()
+            Loadmap();  
         });
 
         document.getElementById("btnscene").addEventListener("click", function () {

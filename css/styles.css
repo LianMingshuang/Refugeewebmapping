@@ -1,5 +1,6 @@
 body {
     font-family: Rockwell, sans-serif;
+    font-size: 1.0em;
 }
 
 .navbar, footer {
@@ -121,4 +122,9 @@ footer {
     align-content:center
 }
 
+#legcont{
+    z-index:500;
+    font-size:0.8em;
+    max-height:200px;
 
+}
