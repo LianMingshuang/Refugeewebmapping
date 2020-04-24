@@ -139,21 +139,25 @@
                             
                             } else if(i == 1){
                                 render = new Render({
-                                size: 10,
-                                color: "#FF4000",
-                                outline: {
-                                    color: [0, 0, 0, 0.4],
-                                    width:7
-                                }
+                                    symbol: new Marker({
+                                        size: 5,
+                                        color: "#0000ff",
+                                        outline: {
+                                            color: [0, 0, 0, 1],
+                                            width: 1
+                                        }
+                                    })
                                 })
                             } else {
                                 render = new Render({
-                                size: 10,
-                                color: "#FF4000",
-                                 outline: {
-                                    color: [0, 0, 0, 0.4],
-                                    width: 7
-                                    }
+                                    symbol: new Marker({
+                                        size: 5,
+                                        color: "#ff0000",
+                                        outline: {
+                                            color: [0, 0, 0, 1],
+                                            width: 1
+                                        }
+                                    })
                                 })
                             
                             }
