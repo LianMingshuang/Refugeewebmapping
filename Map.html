@@ -52,14 +52,12 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-3">
-                    <strong>Toggle Map/Scene View</strong>
-                    <button class="btn btn-primary btn-block" id="btnmap">Map View</button>
-                    <button class="btn btn-warning btn-block" id="btnscene">Scene View</button>
-                    <hr />
-                    <strong>Change Base Map</strong>
+
+                    <strong>Change View Base Map</strong>
                     <select id="lstbasemaps" class="form-control" onchange="ChangeBaseMap()">
                     </select>
                     <hr />
+                    <strong>View Layer Controls</strong>
                     <div class="container">
                         <ul class="nav nav-tabs nav-justified">
                             <li class="nav-item">
@@ -74,10 +72,15 @@
                                 <div id="legcont"></div>
                             </div>
                             <div class="tab-pane container fade" id="cont">
-                                
+
                             </div>
                         </div>
                     </div>
+                    <hr />
+                    <strong>Map Layer Infographics</strong>
+                    <button class="btn btn-primary btn-block" id="btnmap">Migration Statistics</button>
+                    <button class="btn btn-warning btn-block" id="btnscene">Active Layer Information</button>
+                    <hr />
                 </div>
 
                 <div class="col-md-9">
@@ -115,14 +118,14 @@
         Loadmap();
         LoadBaseMaps();
         function Loadmap() {
-            if (viewtype == "Map") {
-                require(["esri/Map",
-                    "esri/views/MapView",
-                    "esri/layers/FeatureLayer",
-                    "esri/widgets/Legend",
-                    "esri/symbols/SimpleMarkerSymbol",
-                    "esri/renderers/SimpleRenderer",
-                    "esri/symbols/SimpleFillSymbol"], function (Map, MapView, MapLayer, Legend, Marker, Render, Fill) {
+
+            require(["esri/Map",
+                "esri/views/MapView",
+                "esri/layers/FeatureLayer",
+                "esri/widgets/Legend",
+                "esri/symbols/SimpleMarkerSymbol",
+                "esri/renderers/SimpleRenderer",
+                "esri/symbols/SimpleFillSymbol"], function (Map, MapView, MapLayer, Legend, Marker, Render, Fill) {
                     base = new Map({ basemap: basem });
                     mapview = new MapView({
                         container: "mapview",
@@ -136,31 +139,31 @@
                         let render;
 
                         if (i == 0) {
-                            
-                            } else if(i == 1){
-                                render = new Render({
-                                    symbol: new Marker({
-                                        size: 5,
-                                        color: "#0000ff",
-                                        outline: {
-                                            color: [0, 0, 0, 1],
-                                            width: 1
-                                        }
-                                    })
+
+                        } else if (i == 1) {
+                            render = new Render({
+                                symbol: new Marker({
+                                    size: 5,
+                                    color: "#0000ff",
+                                    outline: {
+                                        color: [0, 0, 0, 1],
+                                        width: 1
+                                    }
                                 })
-                            } else {
-                                render = new Render({
-                                    symbol: new Marker({
-                                        size: 5,
-                                        color: "#ff0000",
-                                        outline: {
-                                            color: [0, 0, 0, 1],
-                                            width: 1
-                                        }
-                                    })
+                            })
+                        } else {
+                            render = new Render({
+                                symbol: new Marker({
+                                    size: 5,
+                                    color: "#ff0000",
+                                    outline: {
+                                        color: [0, 0, 0, 1],
+                                        width: 1
+                                    }
                                 })
-                            
-                            }
+                            })
+
+                        }
 
                         let layer = new MapLayer({
                             url: pathlist[i],
@@ -168,7 +171,7 @@
                         });
                         base.add(layer);
                     }
-                  
+
                     if (viewrun == 0) {
                         let legend = new Legend({
                             view: mapview
@@ -176,23 +179,8 @@
                     };
                     viewrun++;
                 })
-            }
-            else
-            {
-                require(["esri/Map", "esri/views/SceneView", "esri/layers/FeatureLayer", "esri/widgets/Legend"], function (Map, SceneView, MapLayer, Legend) {
-                    base = new Map({ basemap: basem });
-                    mapview = new SceneView({
-                        container: "mapview",
-                        map: base,
-                        center: [-65.631209, 7.270718],
-                        zoom: 2
-                    })
-                    for (i = 0; i < pathlist.length; i++) {
-                        let layer = new MapLayer({ url: pathlist[i] });
-                        base.add(layer);
-                    }
-                })
-            }
+
+           
         }
 
         function LoadBaseMaps() {
@@ -239,19 +227,11 @@
         }
 
         document.getElementById("btnmap").addEventListener("click", function () {
-            if (viewtype != "Map") {
-               viewtype = "Map";
-            }
-           ChangeBaseMap()
-            Loadmap();  
+             
         });
 
         document.getElementById("btnscene").addEventListener("click", function () {
-            if (viewtype != "Scene") {
-                viewtype = "Scene";
-            }
-            ChangeBaseMap()
-            Loadmap();
+           
         });
     </script>
 </body>
