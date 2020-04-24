@@ -116,7 +116,13 @@
         LoadBaseMaps();
         function Loadmap() {
             if (viewtype == "Map") {
-                require(["esri/Map", "esri/views/MapView", "esri/layers/FeatureLayer", "esri/widgets/Legend"], function (Map, MapView, MapLayer, Legend) {
+                require(["esri/Map",
+                    "esri/views/MapView",
+                    "esri/layers/FeatureLayer",
+                    "esri/widgets/Legend",
+                    "esri/symbols/SimpleMarkerSymbol",
+                    "esri/renderers/SimpleRenderer",
+                    "esri/symbols/SimpleFillSymbol"], function (Map, MapView, MapLayer, Legend, Marker, Render, Fill) {
                     base = new Map({ basemap: basem });
                     mapview = new MapView({
                         container: "mapview",
@@ -124,8 +130,38 @@
                         center: [-65.631209, 7.270718],
                         zoom: 5
                     })
+
                     for (i = 0; i < pathlist.length; i++) {
-                        let layer = new MapLayer({ url: pathlist[i] });
+
+                        let render;
+
+                        if (i == 0) {
+                            
+                            } else if(i == 1){
+                                render = new Render({
+                                size: 10,
+                                color: "#FF4000",
+                                outline: {
+                                    color: [0, 0, 0, 0.4],
+                                    width:7
+                                }
+                                })
+                            } else {
+                                render = new Render({
+                                size: 10,
+                                color: "#FF4000",
+                                 outline: {
+                                    color: [0, 0, 0, 0.4],
+                                    width: 7
+                                    }
+                                })
+                            
+                            }
+
+                        let layer = new MapLayer({
+                            url: pathlist[i],
+                            renderer: render
+                        });
                         base.add(layer);
                     }
                   
