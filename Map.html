@@ -139,6 +139,15 @@
                         let render;
 
                         if (i == 0) {
+                            render = new Render({
+                                symbol: new Fill({
+                                    color: [255, 255, 255, 0],
+                                    outline: {
+                                        color: [0, 0, 0],
+                                        width: 0.3
+                                    }
+                                }) 
+                            });
 
                         } else if (i == 1) {
                             render = new Render({
