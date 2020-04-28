@@ -110,10 +110,11 @@
 
         let viewrun = 0;
 
-        let countrypath = "https://services5.arcgis.com/FKwcDz27wRAj4HUT/arcgis/rest/services/Countries/FeatureServer";
+        let countrypath = "https://services5.arcgis.com/FKwcDz27wRAj4HUT/arcgis/rest/services/Venezuela_Refugee_Destinations/FeatureServer";
         let healthpath = "https://services5.arcgis.com/FKwcDz27wRAj4HUT/arcgis/rest/services/Venezuela_Health/FeatureServer";
         let edupath = "https://services5.arcgis.com/FKwcDz27wRAj4HUT/arcgis/rest/services/Venezuela_Education/FeatureServer";
-        let pathlist = [countrypath, healthpath, edupath]
+        let iompath = "https://services5.arcgis.com/FKwcDz27wRAj4HUT/arcgis/rest/services/IOM_South_America_Offices/FeatureServer";
+        let pathlist = [countrypath, healthpath, edupath, iompath]
 
         Loadmap();
         LoadBaseMaps();
@@ -143,17 +144,28 @@
                                 symbol: new Fill({
                                     color: [255, 255, 255, 0],
                                     outline: {
-                                        color: [0, 0, 0],
-                                        width: 0.3
+                                        color: "grey",
+                                        width: 0.5
                                     }
-                                }) 
+                                })
                             });
 
                         } else if (i == 1) {
                             render = new Render({
                                 symbol: new Marker({
-                                    size: 5,
+                                    size: 4,
                                     color: "#0000ff",
+                                    outline: {
+                                        color: [0, 0, 0, 1],
+                                        width: 1
+                                    }
+                                })
+                            })
+                        } else if (i == 2) {
+                            render = new Render({
+                                symbol: new Marker({
+                                    size: 4,
+                                    color: "#ff0000",
                                     outline: {
                                         color: [0, 0, 0, 1],
                                         width: 1
@@ -164,7 +176,7 @@
                             render = new Render({
                                 symbol: new Marker({
                                     size: 5,
-                                    color: "#ff0000",
+                                    color: "#ffff00",
                                     outline: {
                                         color: [0, 0, 0, 1],
                                         width: 1
