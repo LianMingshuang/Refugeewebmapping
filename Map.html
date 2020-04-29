@@ -78,8 +78,8 @@
                     </div>
                     <hr />
                     <strong>Map Layer Infographics</strong>
-                    <button class="btn btn-primary btn-block" id="btnmap">Migration Statistics</button>
-                    <button class="btn btn-warning btn-block" id="btnscene">Active Layer Information</button>
+                    <button class="btn btn-primary btn-block" id="btnstats">Refugee Statistics</button>
+                    <button class="btn btn-warning btn-block" id="btnscene">Active Layer Info</button>
                     <hr />
                 </div>
 
@@ -109,6 +109,9 @@
         let basem = "topo";
 
         let viewrun = 0;
+        let legend
+        let mpview
+        let polymode = "Default"
 
         let countrypath = "https://services5.arcgis.com/FKwcDz27wRAj4HUT/arcgis/rest/services/Venezuela_Refugee_Destinations/FeatureServer";
         let healthpath = "https://services5.arcgis.com/FKwcDz27wRAj4HUT/arcgis/rest/services/Venezuela_Health/FeatureServer";
@@ -116,41 +119,29 @@
         let iompath = "https://services5.arcgis.com/FKwcDz27wRAj4HUT/arcgis/rest/services/IOM_South_America_Offices/FeatureServer";
         let pathlist = [countrypath, healthpath, edupath, iompath]
 
-        Loadmap();
+        let countrylyr
+        let healthlyr
+        let edulyr
+        let iomlyr
+
+        Createpolygons(polymode)
+        Createpoints();
+        Loadmaplayers();
         LoadBaseMaps();
-        function Loadmap() {
+        Createlegend();
 
-            require(["esri/Map",
-                "esri/views/MapView",
+        function Createpoints() {
+
+            require([
                 "esri/layers/FeatureLayer",
-                "esri/widgets/Legend",
                 "esri/symbols/SimpleMarkerSymbol",
-                "esri/renderers/SimpleRenderer",
-                "esri/symbols/SimpleFillSymbol"], function (Map, MapView, MapLayer, Legend, Marker, Render, Fill) {
-                    base = new Map({ basemap: basem });
-                    mapview = new MapView({
-                        container: "mapview",
-                        map: base,
-                        center: [-65.631209, 7.270718],
-                        zoom: 5
-                    })
-
+                "esri/renderers/SimpleRenderer"], function (MapLayer, Marker, Render) {
+                 
                     for (i = 0; i < pathlist.length; i++) {
 
                         let render;
 
-                        if (i == 0) {
-                            render = new Render({
-                                symbol: new Fill({
-                                    color: [255, 255, 255, 0],
-                                    outline: {
-                                        color: "grey",
-                                        width: 0.5
-                                    }
-                                })
-                            });
-
-                        } else if (i == 1) {
+                        if (i == 1) {
                             render = new Render({
                                 symbol: new Marker({
                                     size: 4,
@@ -161,6 +152,12 @@
                                     }
                                 })
                             })
+
+                            healthlyr = new MapLayer({
+                                url: pathlist[i],
+                                renderer: render
+                            });
+
                         } else if (i == 2) {
                             render = new Render({
                                 symbol: new Marker({
@@ -172,7 +169,12 @@
                                     }
                                 })
                             })
-                        } else {
+
+                            edulyr = new MapLayer({
+                                url: pathlist[i],
+                                renderer: render
+                            });
+                        } else if (i == 3) {
                             render = new Render({
                                 symbol: new Marker({
                                     size: 5,
@@ -183,24 +185,167 @@
                                     }
                                 })
                             })
-                        }
 
-                        let layer = new MapLayer({
-                            url: pathlist[i],
-                            renderer: render
-                        });
-                        base.add(layer);
+                            iomlyr = new MapLayer({
+                                url: pathlist[i],
+                                renderer: render
+                            });
+                        } 
+
                     }
 
+                    /*
                     if (viewrun == 0) {
                         let legend = new Legend({
                             view: mapview
                         }, "legcont");
                     };
                     viewrun++;
+                    */
                 })
         }
 
+        function Createpolygons(mode) {
+            if (mode == "Classified") {
+                require(["esri/layers/FeatureLayer",
+                    "esri/renderers/ClassBreaksRenderer",
+                    "esri/symbols/SimpleFillSymbol"], function (MapLayer, Render, Fill) {
+
+                        let level1 = Fill({
+                            color: "#add8e6",
+                            style: "solid",
+                            outline: {
+                                width: 0.5,
+                                color: "gray"
+                            }
+                        });
+
+                        let level2 = Fill({
+                            color: "#87cefa",
+                            style: "solid",
+                            outline: {
+                                width: 0.5,
+                                color: "gray"
+                            }
+                        });
+
+                        let level3 = Fill({
+                            color: "#87ceeb",
+                            style: "solid",
+                            outline: {
+                                width: 0.5,
+                                color: "gray"
+                            }
+                        });
+
+                        let level4 = Fill({
+                            color: "#4169e1",
+                            style: "solid",
+                            outline: {
+                                width: 0.5,
+                                color: "gray"
+                            }
+                        });
+
+                        let level5 = Fill({
+                            color: "#1e90ff",
+                            style: "solid",
+                            outline: {
+                                width: 0.5,
+                                color: "gray"
+                            }
+                        });
+
+                        let render = new Render({
+                            field: "Percent_",
+                            defaultSymbol: new Fill({
+                                color: [0,0,0,0],
+                                outline: {
+                                    width: 0.5,
+                                    color: "gray"
+                                }
+                            }),
+                            defaultLabel: "no data",
+                            classBreakInfos: [
+                                {
+                                    minValue: 0.1,
+                                    maxValue: 1.0,
+                                    symbol: level1,
+                                    label: "0.1 - 1.0%"
+                                },
+                                {
+                                    minValue: 1.1,
+                                    maxValue: 2.0,
+                                    symbol: level2,
+                                    label: "1.1 - 2.0%"
+                                },
+                                {
+                                    minValue: 2.1,
+                                    maxValue: 10.0,
+                                    symbol: level3,
+                                    label: "2.1 - 10.0%"
+                                },
+                                {
+                                    minValue: 10.1,
+                                    maxValue: 15.0,
+                                    symbol: level4,
+                                    label: "10.1 - 15.0%"
+                                },
+                                {
+                                    minValue: 15.1,
+                                    maxValue: 100.0,
+                                    symbol: level5,
+                                    label: "15.1 - 100%"
+                                }]
+                        });
+
+                            countrylyr = new MapLayer({
+                            url: "https://services5.arcgis.com/FKwcDz27wRAj4HUT/arcgis/rest/services/Venezuela_Refugee_Destinations/FeatureServer",
+                            renderer: render
+                        });
+
+                    })
+            } else {
+
+                require([
+                    "esri/layers/FeatureLayer",
+                    "esri/renderers/SimpleRenderer",
+                    "esri/symbols/SimpleFillSymbol"], function (MapLayer, Render, Fill) {
+
+                        let render = new Render({
+                            symbol: new Fill({
+                                color: [255, 255, 255, 0],
+                                outline: {
+                                    color: "grey",
+                                    width: 0.5
+                                }
+                            })
+                        })
+
+                        countrylyr = new MapLayer({
+                            url: "https://services5.arcgis.com/FKwcDz27wRAj4HUT/arcgis/rest/services/Venezuela_Refugee_Destinations/FeatureServer",
+                            renderer: render
+                        });
+                })
+            }  
+        }
+
+        function Loadmaplayers() {
+            require(["esri/Map",
+                "esri/views/MapView",], function (Map, MapView) {
+                    var map = new Map({
+                        basemap: basem,
+                        layers: [countrylyr, healthlyr, edulyr, iomlyr]
+                    });
+
+                    mpview = new MapView({
+                        container: "mapview",
+                        map: map,
+                        center: [-65.631209, 7.270718],
+                        zoom: 5
+                    })
+            })
+        }
         function LoadBaseMaps() {
             let basemaps = ["Topographic Map", "Satellite Map", "Hybrid Map", "Openstreet Map", "Street Map", "Terrain Map"];
             let lstbasemaps = document.getElementById("lstbasemaps");
@@ -233,23 +378,37 @@
                     basem = "terrain";
                     break;
             }
-            Loadmap();
+            Createpolygons("Classified")
+            Createpoints()
+            Loadmaplayers()
         }
 
-        function Initializelegend() {
-            let cont = docum.getElementById("legcont");
-            if (cont.hasChildNodes()) {
-                cont.removeChild(cont.childNodes[0]);
+
+        function Createlegend() {
+
+            require(["esri/widgets/Legend"], function (Legend) {
+                if (viewrun == 0) {
+                    let legend = new Legend({
+                        view: mpview
+                    }, "legcont");
+                };
+                viewrun++;
+            })   
+        }
+
+        document.getElementById("btnstats").addEventListener("click", function () {
+            if (polymode == "Default") {
+                polymode = "Classified"
+            } else if (polymode == "Classified") {
+                polymode = "Default"
             }
-            let legend = new Legend({ view: mapview }, "legcont");
-        }
-
-        document.getElementById("btnmap").addEventListener("click", function () {
-             
+            Createpolygons(polymode)
+            Loadmaplayers();
+            Createlegend();
         });
 
         document.getElementById("btnscene").addEventListener("click", function () {
-           
+            
         });
     </script>
 </body>
