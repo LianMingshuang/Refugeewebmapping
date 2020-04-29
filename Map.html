@@ -191,17 +191,7 @@
                                 renderer: render
                             });
                         } 
-
                     }
-
-                    /*
-                    if (viewrun == 0) {
-                        let legend = new Legend({
-                            view: mapview
-                        }, "legcont");
-                    };
-                    viewrun++;
-                    */
                 })
         }
 
@@ -212,7 +202,7 @@
                     "esri/symbols/SimpleFillSymbol"], function (MapLayer, Render, Fill) {
 
                         let level1 = Fill({
-                            color: "#add8e6",
+                            color: "#fff8dc",
                             style: "solid",
                             outline: {
                                 width: 0.5,
@@ -221,7 +211,7 @@
                         });
 
                         let level2 = Fill({
-                            color: "#87cefa",
+                            color: "#ffe4b5",
                             style: "solid",
                             outline: {
                                 width: 0.5,
@@ -230,7 +220,7 @@
                         });
 
                         let level3 = Fill({
-                            color: "#87ceeb",
+                            color: "#cd853f",
                             style: "solid",
                             outline: {
                                 width: 0.5,
@@ -239,7 +229,7 @@
                         });
 
                         let level4 = Fill({
-                            color: "#4169e1",
+                            color: "#a0522d",
                             style: "solid",
                             outline: {
                                 width: 0.5,
@@ -248,7 +238,7 @@
                         });
 
                         let level5 = Fill({
-                            color: "#1e90ff",
+                            color: "#800000",
                             style: "solid",
                             outline: {
                                 width: 0.5,
@@ -385,14 +375,21 @@
 
 
         function Createlegend() {
-
             require(["esri/widgets/Legend"], function (Legend) {
+                let legend = new Legend({
+                    view: mpview
+                }, "legcont");
+
+
+                /*
                 if (viewrun == 0) {
                     let legend = new Legend({
                         view: mpview
                     }, "legcont");
                 };
                 viewrun++;
+
+                */
             })   
         }
 
