@@ -376,20 +376,21 @@
 
         function Createlegend() {
             require(["esri/widgets/Legend"], function (Legend) {
+                
                 let legend = new Legend({
                     view: mpview
                 }, "legcont");
-
-
-                /*
+                
+               /*
                 if (viewrun == 0) {
-                    let legend = new Legend({
+                    legend = new Legend({
                         view: mpview
                     }, "legcont");
-                };
+                } else {
+                    
+                }
                 viewrun++;
-
-                */
+                 */  
             })   
         }
 
