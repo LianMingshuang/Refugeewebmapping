@@ -122,7 +122,7 @@ footer {
     align-content:center
 }
 
-#legcont{
+#legcont, #toc{
     z-index:500;
     font-size:0.8em;
     max-height:200px;

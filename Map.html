@@ -53,31 +53,31 @@
             <div class="row">
                 <div class="col-md-3">
 
-                    <strong>Map View Base Map</strong>
+                    
                     <select id="lstbasemaps" class="form-control" onchange="ChangeBaseMap()">
                     </select>
                     <hr />
-                    <strong>Map View Layer Controls</strong>
+                    
                     <div class="container">
                         <ul class="nav nav-tabs nav-justified">
                             <li class="nav-item">
-                                <a class="nav-link active" href="#leg" data-toggle="tab">Legend</a>
+                                <a class="nav-link active" href="#cont" data-toggle="tab">Contents</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#cont" data-toggle="tab">Contents</a>
+                                <a class="nav-link" href="#leg" data-toggle="tab">Legend</a>
                             </li>
                         </ul>
                         <div class="tab-content">
-                            <div class="tab-pane container fade in active" id="leg">
-                                <div id="legcont"></div>
+                            <div class="tab-pane container fade in active" id="cont">
+                                <div id="toc"></div>
                             </div>
-                            <div class="tab-pane container fade" id="cont">
-
+                            <div class="tab-pane container fade" id="leg">
+                                <div id="legcont"></div>
                             </div>
                         </div>
                     </div>
                     <hr />
-                    <strong>Map Layer Infographics</strong>
+                    
                     <button class="btn btn-primary btn-block" id="btnstats">Refugee Statistics</button>
                     <button class="btn btn-warning btn-block" id="btnscene">Active Layer Info</button>
                     <hr />
@@ -129,6 +129,7 @@
         Loadmaplayers();
         LoadBaseMaps();
         Createlegend();
+        CreateTOC();
 
         function Createpoints() {
 
@@ -321,8 +322,10 @@
         }
 
         function Loadmaplayers() {
+            
             require(["esri/Map",
                 "esri/views/MapView",], function (Map, MapView) {
+
                     var map = new Map({
                         basemap: basem,
                         layers: [countrylyr, healthlyr, edulyr, iomlyr]
@@ -336,6 +339,7 @@
                     })
             })
         }
+
         function LoadBaseMaps() {
             let basemaps = ["Topographic Map", "Satellite Map", "Hybrid Map", "Openstreet Map", "Street Map", "Terrain Map"];
             let lstbasemaps = document.getElementById("lstbasemaps");
@@ -368,19 +372,18 @@
                     basem = "terrain";
                     break;
             }
-            Createpolygons("Classified")
+            Createpolygons(polymode)
             Createpoints()
             Loadmaplayers()
+            Createlegend()
         }
-
 
         function Createlegend() {
             require(["esri/widgets/Legend"], function (Legend) {
-                
+               
                 let legend = new Legend({
                     view: mpview
                 }, "legcont");
-                
                /*
                 if (viewrun == 0) {
                     legend = new Legend({
@@ -394,6 +397,14 @@
             })   
         }
 
+        function CreateTOC() {
+            require(["esri/widgets/LayerList"], function (Layerlist) {
+                let layerlist = new Layerlist({
+                    view: mpview
+                }, "toc");
+            })
+        }
+
         document.getElementById("btnstats").addEventListener("click", function () {
             if (polymode == "Default") {
                 polymode = "Classified"
@@ -403,6 +414,7 @@
             Createpolygons(polymode)
             Loadmaplayers();
             Createlegend();
+            CreateTOC();
         });
 
         document.getElementById("btnscene").addEventListener("click", function () {
