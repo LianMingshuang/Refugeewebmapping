@@ -96,7 +96,8 @@
         let map;
         let legend;
         let mpview;
-        let polymode = "Default"
+        let layerlist;
+        let polymode = "Default";
 
         let countrypath = "https://services5.arcgis.com/FKwcDz27wRAj4HUT/arcgis/rest/services/Venezuela_Refugee_Destinations/FeatureServer";
         let healthpath = "https://services5.arcgis.com/FKwcDz27wRAj4HUT/arcgis/rest/services/Venezuela_Health/FeatureServer";
@@ -359,12 +360,12 @@
             Createpolygons(polymode)
             Createpoints()
             Loadmaplayers()
-            Createlegend()
+            CreateTOC();
         }
 
         function CreateTOC() {
             require(["esri/widgets/LayerList"], function (Layerlist) {
-                let layerlist = new Layerlist({
+                layerlist = new Layerlist({
                     view: mpview,
                     listItemCreatedFunction: function (event) {
                         const item = event.item;
@@ -385,10 +386,13 @@
             } else if (polymode == "Classified") {
                 polymode = "Default"
             }
+            
             Createpolygons(polymode)
             Createpoints();
             Loadmaplayers();
             CreateTOC();
+
+            alert(mpview.maps.length);
         });
 
         document.getElementById("btnscene").addEventListener("click", function () {
