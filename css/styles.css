@@ -115,8 +115,9 @@ footer {
 
 
 #mapview{
-    height:470px;
+    height:530px;
     width:100%;
+
 }
 #mapwrap{
     align-content:center
@@ -125,7 +126,7 @@ footer {
 #legcont, #toc{
     z-index:500;
     font-size:0.8em;
-    max-height:200px;
+    max-height:270px;
 
 }
 
