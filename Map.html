@@ -53,31 +53,16 @@
             <div class="row">
                 <div class="col-md-3">
 
-                    
                     <select id="lstbasemaps" class="form-control" onchange="ChangeBaseMap()">
                     </select>
                     <hr />
-                    
+
                     <div class="container">
-                        <ul class="nav nav-tabs nav-justified">
-                            <li class="nav-item">
-                                <a class="nav-link active" href="#cont" data-toggle="tab">Contents</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#leg" data-toggle="tab">Legend</a>
-                            </li>
-                        </ul>
-                        <div class="tab-content">
-                            <div class="tab-pane container fade in active" id="cont">
-                                <div id="toc"></div>
-                            </div>
-                            <div class="tab-pane container fade" id="leg">
-                                <div id="legcont"></div>
-                            </div>
-                        </div>
+                        
+                        <div id="toc"></div>
                     </div>
                     <hr />
-                    
+
                     <button class="btn btn-primary btn-block" id="btnstats">Refugee Statistics</button>
                     <button class="btn btn-warning btn-block" id="btnscene">Active Layer Info</button>
                     <hr />
@@ -108,9 +93,9 @@
         let viewtype = "Map";
         let basem = "topo";
 
-        let viewrun = 0;
-        let legend
-        let mpview
+        let map;
+        let legend;
+        let mpview;
         let polymode = "Default"
 
         let countrypath = "https://services5.arcgis.com/FKwcDz27wRAj4HUT/arcgis/rest/services/Venezuela_Refugee_Destinations/FeatureServer";
@@ -128,7 +113,6 @@
         Createpoints();
         Loadmaplayers();
         LoadBaseMaps();
-        Createlegend();
         CreateTOC();
 
         function Createpoints() {
@@ -325,8 +309,8 @@
             
             require(["esri/Map",
                 "esri/views/MapView",], function (Map, MapView) {
-
-                    var map = new Map({
+                    //map.removeAll();
+                    map = new Map({
                         basemap: basem,
                         layers: [countrylyr, healthlyr, edulyr, iomlyr]
                     });
@@ -378,29 +362,19 @@
             Createlegend()
         }
 
-        function Createlegend() {
-            require(["esri/widgets/Legend"], function (Legend) {
-               
-                let legend = new Legend({
-                    view: mpview
-                }, "legcont");
-               /*
-                if (viewrun == 0) {
-                    legend = new Legend({
-                        view: mpview
-                    }, "legcont");
-                } else {
-                    
-                }
-                viewrun++;
-                 */  
-            })   
-        }
-
         function CreateTOC() {
             require(["esri/widgets/LayerList"], function (Layerlist) {
                 let layerlist = new Layerlist({
-                    view: mpview
+                    view: mpview,
+                    listItemCreatedFunction: function (event) {
+                        const item = event.item;
+                        if (item.layer.type != "group") {
+                            item.panel = {
+                                content: "legend",
+                                open: false
+                            }
+                        }
+                    }
                 }, "toc");
             })
         }
@@ -412,8 +386,8 @@
                 polymode = "Default"
             }
             Createpolygons(polymode)
+            Createpoints();
             Loadmaplayers();
-            Createlegend();
             CreateTOC();
         });
 
