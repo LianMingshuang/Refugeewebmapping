@@ -97,7 +97,7 @@
         let legend;
         let mpview;
         let layerlist;
-        let polymode = "Default";
+        let polymode = "Simple";
 
         let countrypath = "https://services5.arcgis.com/FKwcDz27wRAj4HUT/arcgis/rest/services/Venezuela_Refugee_Destinations/FeatureServer";
         let healthpath = "https://services5.arcgis.com/FKwcDz27wRAj4HUT/arcgis/rest/services/Venezuela_Health/FeatureServer";
@@ -110,25 +110,42 @@
         let edulyr
         let iomlyr
 
-        Createpolygons(polymode)
-        Createpoints();
         Loadmaplayers();
         LoadBaseMaps();
-        CreateTOC();
 
-        function Createpoints() {
-
-            require([
-                "esri/layers/FeatureLayer",
+        function Loadmaplayers() {
+            
+            require(["esri/Map",
+                "esri/views/MapView",
+                "esri/widgets/LayerList",
+                "esri/renderers/SimpleRenderer",
+                "esri/symbols/SimpleFillSymbol",
                 "esri/symbols/SimpleMarkerSymbol",
-                "esri/renderers/SimpleRenderer"], function (MapLayer, Marker, Render) {
-                 
+                "esri/layers/FeatureLayer"], function (Map, MapView, Layerlist, SimpRender, Fill, Marker, MapLayer) {
+                    //Start Creatting Polygon
+                    let polyrender = new SimpRender({
+                        symbol: new Fill({
+                            color: [255, 255, 255, 0],
+                            outline: {
+                                color: "grey",
+                                width: 0.5
+                            }
+                        })
+                    })
+
+                    countrylyr = new MapLayer({
+                        url: "https://services5.arcgis.com/FKwcDz27wRAj4HUT/arcgis/rest/services/Venezuela_Refugee_Destinations/FeatureServer",
+                        renderer: polyrender
+                    });
+                    //End creating polygon
+
+                    //Start creating points
                     for (i = 0; i < pathlist.length; i++) {
 
-                        let render;
+                        let pointrender;
 
                         if (i == 1) {
-                            render = new Render({
+                            pointrender = new SimpRender({
                                 symbol: new Marker({
                                     size: 4,
                                     color: "#0000ff",
@@ -141,11 +158,11 @@
 
                             healthlyr = new MapLayer({
                                 url: pathlist[i],
-                                renderer: render
+                                renderer: pointrender
                             });
 
                         } else if (i == 2) {
-                            render = new Render({
+                            pointrender = new SimpRender({
                                 symbol: new Marker({
                                     size: 4,
                                     color: "#ff0000",
@@ -158,10 +175,10 @@
 
                             edulyr = new MapLayer({
                                 url: pathlist[i],
-                                renderer: render
+                                renderer: pointrender
                             });
                         } else if (i == 3) {
-                            render = new Render({
+                            pointrender = new SimpRender({
                                 symbol: new Marker({
                                     size: 7,
                                     color: "#00ff00",
@@ -174,21 +191,90 @@
 
                             iomlyr = new MapLayer({
                                 url: pathlist[i],
-                                renderer: render
+                                renderer: pointrender
                             });
-                        } 
+                        }
                     }
-                })
+
+                    //End creating points
+                
+                    //Start creating map and view
+                    map = new Map({
+                        basemap: basem,
+                        layers: [countrylyr, healthlyr, edulyr, iomlyr]
+                    });
+
+                    mpview = new MapView({
+                        container: "mapview",
+                        map: map,
+                        center: [-65.631209, 7.270718],
+                        zoom: 5
+                    })
+                    //End creating map and view
+
+                    //Start creating layer list
+                    layerlist = new Layerlist({
+                        view: mpview,
+                        listItemCreatedFunction: function (event) {
+                            const item = event.item;
+                            if (item.layer.type != "group") {
+                                item.panel = {
+                                    content: "legend",
+                                    open: false
+                                }
+                            }
+                        }
+                    }, "toc");
+                    //End creating layer list
+            })
         }
 
-        function Createpolygons(mode) {
-            if (mode == "Classified") {
-                require(["esri/layers/FeatureLayer",
-                    "esri/renderers/ClassBreaksRenderer",
-                    "esri/symbols/SimpleFillSymbol"], function (MapLayer, Render, Fill) {
+        function LoadBaseMaps() {
+            let basemaps = ["Topographic Map", "Satellite Map", "Hybrid Map", "Openstreet Map", "Street Map", "Terrain Map"];
+            let lstbasemaps = document.getElementById("lstbasemaps");
+            for (i = 0; i < basemaps.length; i++) {
+                let option = document.createElement("option");
+                option.textContent = basemaps[i];
+                lstbasemaps.appendChild(option);
+            };
+        }
+
+        function ChangeBaseMap() {
+            let selectbase = document.getElementById("lstbasemaps").value;
+            switch (selectbase) {
+                case "Topographic Map":
+                    basem = "topo";
+                    break;
+                case "Satellite Map":
+                    basem = "satellite";
+                    break;
+                case "Hybrid Map":
+                    basem = "hybrid";
+                    break;
+                case "Openstreet Map":
+                    basem = "osm";
+                    break;
+                case "Street Map":
+                    basem = "streets";
+                    break;
+                case "Terrain Map":
+                    basem = "terrain";
+                    break;
+            }
+
+            map.basemap = basem;
+        }
+
+        document.getElementById("btnstats").addEventListener("click", function () {
+
+            require(["esri/symbols/SimpleFillSymbol",
+                "esri/renderers/SimpleRenderer",
+                "esri/renderers/ClassBreaksRenderer"], function (Fill, SimpRender, ClassRender) {
+                    if (polymode == "Simple") {
+                        polymode = "Classified"
 
                         let level1 = Fill({
-                            color: "#ffdab9",
+                            color: [255, 0, 0, 0.2],
                             style: "solid",
                             outline: {
                                 width: 0.5,
@@ -197,7 +283,7 @@
                         });
 
                         let level2 = Fill({
-                            color: "#ffff00",
+                            color: [255, 0, 0, 0.4],
                             style: "solid",
                             outline: {
                                 width: 0.5,
@@ -206,7 +292,7 @@
                         });
 
                         let level3 = Fill({
-                            color: "#cd853f",
+                            color: [255, 0, 0, 0.6],
                             style: "solid",
                             outline: {
                                 width: 0.5,
@@ -215,7 +301,7 @@
                         });
 
                         let level4 = Fill({
-                            color: "#a0522d",
+                            color: [255, 0, 0, 0.8],
                             style: "solid",
                             outline: {
                                 width: 0.5,
@@ -224,7 +310,7 @@
                         });
 
                         let level5 = Fill({
-                            color: "#800000",
+                            color: [255, 0, 0, 1],
                             style: "solid",
                             outline: {
                                 width: 0.5,
@@ -232,10 +318,10 @@
                             }
                         });
 
-                        let render = new Render({
+                        let classrender = new ClassRender({
                             field: "Percent_",
                             defaultSymbol: new Fill({
-                                color: [0,0,0,0],
+                                color: [0, 0, 0, 0],
                                 outline: {
                                     width: 0.5,
                                     color: "gray"
@@ -275,20 +361,11 @@
                                 }]
                         });
 
-                            countrylyr = new MapLayer({
-                            url: "https://services5.arcgis.com/FKwcDz27wRAj4HUT/arcgis/rest/services/Venezuela_Refugee_Destinations/FeatureServer",
-                            renderer: render
-                        });
+                        countrylyr.renderer = classrender;
 
-                    })
-            } else {
-
-                require([
-                    "esri/layers/FeatureLayer",
-                    "esri/renderers/SimpleRenderer",
-                    "esri/symbols/SimpleFillSymbol"], function (MapLayer, Render, Fill) {
-
-                        let render = new Render({
+                    } else if (polymode == "Classified") {
+                        polymode = "Simple"
+                        let simprender = new SimpRender({
                             symbol: new Fill({
                                 color: [255, 255, 255, 0],
                                 outline: {
@@ -297,102 +374,11 @@
                                 }
                             })
                         })
-
-                        countrylyr = new MapLayer({
-                            url: "https://services5.arcgis.com/FKwcDz27wRAj4HUT/arcgis/rest/services/Venezuela_Refugee_Destinations/FeatureServer",
-                            renderer: render
-                        });
-                })
-            }  
-        }
-
-        function Loadmaplayers() {
-            
-            require(["esri/Map",
-                "esri/views/MapView",], function (Map, MapView) {
-                    //map.removeAll();
-                    map = new Map({
-                        basemap: basem,
-                        layers: [countrylyr, healthlyr, edulyr, iomlyr]
-                    });
-
-                    mpview = new MapView({
-                        container: "mapview",
-                        map: map,
-                        center: [-65.631209, 7.270718],
-                        zoom: 5
-                    })
-            })
-        }
-
-        function LoadBaseMaps() {
-            let basemaps = ["Topographic Map", "Satellite Map", "Hybrid Map", "Openstreet Map", "Street Map", "Terrain Map"];
-            let lstbasemaps = document.getElementById("lstbasemaps");
-            for (i = 0; i < basemaps.length; i++) {
-                let option = document.createElement("option");
-                option.textContent = basemaps[i];
-                lstbasemaps.appendChild(option);
-            };
-        }
-
-        function ChangeBaseMap() {
-            let selectbase = document.getElementById("lstbasemaps").value;
-            switch (selectbase) {
-                case "Topographic Map":
-                    basem = "topo";
-                    break;
-                case "Satellite Map":
-                    basem = "satellite";
-                    break;
-                case "Hybrid Map":
-                    basem = "hybrid";
-                    break;
-                case "Openstreet Map":
-                    basem = "osm";
-                    break;
-                case "Street Map":
-                    basem = "streets";
-                    break;
-                case "Terrain Map":
-                    basem = "terrain";
-                    break;
-            }
-            Createpolygons(polymode)
-            Createpoints()
-            Loadmaplayers()
-            CreateTOC();
-        }
-
-        function CreateTOC() {
-            require(["esri/widgets/LayerList"], function (Layerlist) {
-                layerlist = new Layerlist({
-                    view: mpview,
-                    listItemCreatedFunction: function (event) {
-                        const item = event.item;
-                        if (item.layer.type != "group") {
-                            item.panel = {
-                                content: "legend",
-                                open: false
-                            }
-                        }
+                        countrylyr.renderer = simprender;
                     }
-                }, "toc");
-            })
-        }
 
-        document.getElementById("btnstats").addEventListener("click", function () {
-            if (polymode == "Default") {
-                polymode = "Classified"
-            } else if (polymode == "Classified") {
-                polymode = "Default"
-            }
-            
-            Createpolygons(polymode)
-            Createpoints();
-            Loadmaplayers();
-            CreateTOC();
-
-        });
+                });
+        })
 
         document.getElementById("btnscene").addEventListener("click", function () {
             
